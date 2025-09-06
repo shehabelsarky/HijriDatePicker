@@ -76,7 +76,7 @@ afterEvaluate {
             create<MavenPublication>("release") {
                 from(components["release"])
 
-                groupId = "com.github.YOUR_GITHUB_USERNAME"
+                groupId = "com.github.shehabelsarky"
                 artifactId = "HijriDatePicker"
                 version = "1.0.1"
             }
