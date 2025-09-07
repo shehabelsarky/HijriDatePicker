@@ -29,7 +29,10 @@ import com.abdulrahman_b.hijrahdatetime.extensions.HijrahDates
 import com.abdulrahman_b.hijridatepicker.*
 import com.abdulrahman_b.hijridatepicker.R
 import com.abdulrahman_b.hijridatepicker.datepicker.HijriDatePickerDefaults.dateFormatter
+import java.time.chrono.HijrahChronology
 import java.time.chrono.HijrahDate
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 object HijriDatePickerDefaults {
@@ -109,34 +112,30 @@ object HijriDatePickerDefaults {
         val decimalStyle = LocalPickerDecimalStyle.current
         val dateFormatter = LocalPickerFormatter.current
 
-        val formattedDate = dateFormatter.formatDate(
-            date = selectedDate,
-            locale = locale,
-            decimalStyle = decimalStyle,
-            forContentDescription = false
-        )
-        val verboseDateDescription = dateFormatter.formatDate(
-            date = selectedDate,
-            locale = locale,
-            decimalStyle = decimalStyle,
-            forContentDescription = true
-        ) ?: when (displayMode) {
-            DisplayMode.Companion.Picker -> stringResource(R.string.date_picker_no_selection_description)
-            DisplayMode.Companion.Input -> stringResource(R.string.date_input_no_input_description)
+        val hijriFormatter: DateTimeFormatter =
+            DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.getDefault())
+                .withChronology(HijrahChronology.INSTANCE)
+
+        val formattedDate = selectedDate?.format(hijriFormatter)
+
+        val headlineText = formattedDate ?: when (displayMode) {
+            DisplayMode.Picker -> stringResource(R.string.date_picker_headline)
+            DisplayMode.Input -> stringResource(R.string.date_input_headline)
             else -> ""
         }
 
-        val headlineText = formattedDate ?: when (displayMode) {
-            DisplayMode.Companion.Picker -> stringResource(R.string.date_picker_headline)
-            DisplayMode.Companion.Input -> stringResource(R.string.date_input_headline)
+        val verboseDateDescription = formattedDate ?: when (displayMode) {
+            DisplayMode.Picker -> stringResource(R.string.date_picker_no_selection_description)
+            DisplayMode.Input -> stringResource(R.string.date_input_no_input_description)
             else -> ""
         }
 
         val headlineDescription = when (displayMode) {
-            DisplayMode.Companion.Picker -> stringResource(R.string.date_picker_headline_description)
-            DisplayMode.Companion.Input -> stringResource(R.string.date_input_headline_description)
+            DisplayMode.Picker -> stringResource(R.string.date_picker_headline_description)
+            DisplayMode.Input -> stringResource(R.string.date_input_headline_description)
             else -> ""
         }.format(verboseDateDescription)
+
 
         val style = LocalTextStyle.current
         var fontSize by remember(style) {

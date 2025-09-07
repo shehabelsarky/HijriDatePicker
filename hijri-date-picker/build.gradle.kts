@@ -75,10 +75,9 @@ afterEvaluate {
         publications {
             create<MavenPublication>("release") {
                 from(components["release"])
-
                 groupId = "com.github.shehabelsarky"
                 artifactId = "HijriDatePicker"
-                version = "1.0.1"
+                version = "1.0.2"
             }
         }
     }

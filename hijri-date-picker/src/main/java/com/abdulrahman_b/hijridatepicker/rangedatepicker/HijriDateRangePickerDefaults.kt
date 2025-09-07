@@ -37,6 +37,7 @@ import com.abdulrahman_b.hijridatepicker.LocalPickerFormatter
 import com.abdulrahman_b.hijridatepicker.LocalPickerLocale
 import com.abdulrahman_b.hijridatepicker.R
 import java.time.chrono.HijrahDate
+import java.time.format.DateTimeFormatter
 
 /** Contains default values used by the [HijriDateRangePicker]. */
 @ExperimentalMaterial3Api
@@ -132,11 +133,10 @@ object HijriDateRangePickerDefaults {
         val defaultLocale = LocalPickerLocale.current
         val decimalStyle = LocalPickerDecimalStyle.current
         val dateFormatter = LocalPickerFormatter.current
-        val formatterStartDate =
-            dateFormatter.formatHeadlineDate(selectedStartDate, defaultLocale, decimalStyle)
 
-        val formatterEndDate =
-            dateFormatter.formatHeadlineDate(selectedEndDate, defaultLocale, decimalStyle)
+        val hijriFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+        val formatterStartDate = selectedStartDate?.format(hijriFormatter)
+        val formatterEndDate = selectedEndDate?.format(hijriFormatter)
 
         val verboseStartDateDescription =
             dateFormatter.formatDate(
