@@ -178,7 +178,7 @@ Step 2: Add the library dependency:
 
 ```kotlin
 dependencies {
-    implementation("com.abdulrahman-b.hijridatepicker:hijridatepicker:1.0.1")
+    implementation("com.github.shehabelsarky:HijriDatePicker:v1.0.1")
 }
 ```
 
@@ -186,16 +186,9 @@ dependencies {
 
 ```groovy
 dependencies {
-    implementation "com.abdulrahman-b.hijridatepicker:hijridatepicker:1.0.1"
+    implementation "com.github.shehabelsarky:HijriDatePicker:v1.0.1"
 }
 ```
 
 ---
 
-## Support Me
-
-If you find this project helpful, please support me! Donations are greatly appreciated:
-
-[![Donate via PayPal](https://img.shields.io/badge/Donate-PayPal-blue.svg?logo=paypal)](https://www.paypal.com/paypalme/AbdulrahmanBahamel)
-
-Thank you for your contributions!
