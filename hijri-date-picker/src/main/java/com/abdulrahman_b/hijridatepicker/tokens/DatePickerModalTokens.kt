@@ -34,7 +34,7 @@ internal object DatePickerModalTokens {
     val RangeSelectionHeaderContainerHeight = 128.0.dp
     val RangeSelectionHeaderHeadlineFont @Composable get() = MaterialTheme.typography.titleLarge
     val RangeSelectionMonthSubheadFont @Composable get() = MaterialTheme.typography.titleSmall
-    val WeekdaysLabelTextFont @Composable get() = MaterialTheme.typography.bodyLarge
+    val WeekdaysLabelTextFont @Composable get() = MaterialTheme.typography.bodyMedium
     val SelectionYearContainerHeight = 36.0.dp
     val SelectionYearContainerWidth = 72.0.dp
     val SelectionYearLabelTextFont @Composable get() = MaterialTheme.typography.bodyLarge

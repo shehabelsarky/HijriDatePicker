@@ -32,6 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.sp
@@ -70,14 +71,17 @@ internal fun WeekDays(
 
     Row(
         modifier =
-            Modifier.defaultMinSize(minHeight = RecommendedSizeForAccessibility).fillMaxWidth(),
+            Modifier
+                .defaultMinSize(minHeight = RecommendedSizeForAccessibility)
+                .fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically
     ) {
         dayNames.fastForEach {
             Box(
                 modifier =
-                    Modifier.clearAndSetSemantics { contentDescription = it.first }
+                    Modifier
+                        .clearAndSetSemantics { contentDescription = it.first }
                         .size(
                             width = RecommendedSizeForAccessibility,
                             height = RecommendedSizeForAccessibility
@@ -87,8 +91,8 @@ internal fun WeekDays(
                 Text(
                     text = it.second,
                     modifier = Modifier.wrapContentSize(),
-                    color = colorResource(R.color.light_gray),
-                    style = textStyle.copy(fontSize = 13.sp),
+                    color = colorResource(R.color.light_gray2),
+                    style = textStyle.copy(fontSize = 13.sp, fontWeight = FontWeight.Normal),
                     overflow = TextOverflow.Ellipsis,
                     textAlign = TextAlign.Center
                 )

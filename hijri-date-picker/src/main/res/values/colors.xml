@@ -2,6 +2,8 @@
 <resources>
     <color name="white">#FFFFFF</color>
     <color name="dark_blue">#173E67</color>
-    <color name="light_gray">#9EB3C2</color>
+    <color name="light_gray">#BEBEBE</color>
+    <color name="light_gray2">#9EB3C2</color>
     <color name="dark_text_color">#121212</color>
+    <color name="secondary_light">#E6EDFD</color>
 </resources>

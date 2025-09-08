@@ -201,7 +201,7 @@ object HijriDateRangePickerDefaults {
                 Text(
                     text = formatterEndDate,
                     maxLines = 1,
-                    fontSize = fontSize.sp,
+                    fontSize = 14.sp,
                     onTextLayout = { result ->
                         if (result.hasVisualOverflow) {
                             fontSize--

@@ -92,8 +92,8 @@ internal fun DatePickerColors.dayContentColor(
     val target = when {
         selected && enabled -> Color.White  // Selected text = white
         selected && !enabled -> colorResource(R.color.light_gray) // Disabled selected
-        inRange && enabled -> dayInSelectionRangeContentColor
-        inRange && !enabled -> disabledDayContentColor
+        inRange && enabled -> colorResource(R.color.secondary_light)
+        inRange && !enabled -> colorResource(R.color.light_gray)
         isToday -> todayContentColor
         enabled -> colorResource(R.color.dark_text_color) // Enabled default
         else -> colorResource(R.color.light_gray) // Disabled default
@@ -121,7 +121,7 @@ fun DatePickerColors.dayContainerColor(
     animate: Boolean
 ): State<Color> {
     val target = when {
-        selected && enabled -> MaterialTheme.colorScheme.primary // Selected background = primary
+        selected && enabled -> MaterialTheme.colorScheme.secondary // Selected background = secondary
         selected && !enabled -> Color.Transparent                 // Disabled selected background
         else -> Color.Transparent                                 // Default background
     }
@@ -172,7 +172,7 @@ internal fun DatePickerColors.yearContentColor(
 internal fun DatePickerColors.yearContainerColor(selected: Boolean, enabled: Boolean): State<Color> {
     val target =
         if (selected) {
-            if (enabled) selectedYearContainerColor else disabledSelectedYearContainerColor
+            if (enabled) MaterialTheme.colorScheme.secondary else disabledSelectedYearContainerColor
         } else {
             Color.Transparent
         }
