@@ -29,14 +29,17 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.util.fastForEach
 import com.abdulrahman_b.hijridatepicker.LocalDayOfWeekTextStyle
 import com.abdulrahman_b.hijridatepicker.LocalFirstDayOfWeek
 import com.abdulrahman_b.hijridatepicker.LocalPickerLocale
+import com.abdulrahman_b.hijridatepicker.R
 import com.abdulrahman_b.hijridatepicker.datepicker.RecommendedSizeForAccessibility
 import com.abdulrahman_b.hijridatepicker.tokens.DatePickerModalTokens
 import java.time.DayOfWeek
@@ -84,8 +87,8 @@ internal fun WeekDays(
                 Text(
                     text = it.second,
                     modifier = Modifier.wrapContentSize(),
-                    color = colors.weekdayContentColor,
-                    style = textStyle,
+                    color = colorResource(R.color.light_gray),
+                    style = textStyle.copy(fontSize = 13.sp),
                     overflow = TextOverflow.Ellipsis,
                     textAlign = TextAlign.Center
                 )

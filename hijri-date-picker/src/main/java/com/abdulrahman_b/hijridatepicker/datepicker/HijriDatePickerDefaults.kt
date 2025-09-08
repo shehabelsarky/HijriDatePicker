@@ -19,6 +19,7 @@ package com.abdulrahman_b.hijridatepicker.datepicker
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.contentDescription
@@ -142,13 +143,14 @@ object HijriDatePickerDefaults {
             mutableFloatStateOf(style.fontSize.value)
         }
         Text(
+            color = colorResource(R.color.dark_blue),
             text = headlineText,
             modifier = modifier.semantics {
                 liveRegion = LiveRegionMode.Companion.Polite
                 contentDescription = headlineDescription
             },
             maxLines = 1,
-            fontSize = fontSize.sp,
+            fontSize = 14.sp,
             onTextLayout = { result ->
                 if (result.hasVisualOverflow) {
                     fontSize--

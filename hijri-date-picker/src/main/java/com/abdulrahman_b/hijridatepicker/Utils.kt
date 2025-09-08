@@ -30,6 +30,7 @@ import androidx.compose.material3.DisplayMode
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ReadOnlyComposable
@@ -37,6 +38,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.TextStyle
 import com.abdulrahman_b.hijrahdatetime.extensions.HijrahDates.dayOfWeek
 import com.abdulrahman_b.hijrahdatetime.extensions.HijrahDates.withDayOfMonth
@@ -87,24 +89,23 @@ internal fun DatePickerColors.dayContentColor(
     inRange: Boolean,
     enabled: Boolean
 ): State<Color> {
-    val target =
-        when {
-            selected && enabled -> selectedDayContentColor
-            selected && !enabled -> disabledSelectedDayContentColor
-            inRange && enabled -> dayInSelectionRangeContentColor
-            inRange && !enabled -> disabledDayContentColor
-            isToday -> todayContentColor
-            enabled -> dayContentColor
-            else -> disabledDayContentColor
-        }
+    val target = when {
+        selected && enabled -> Color.White  // Selected text = white
+        selected && !enabled -> colorResource(R.color.light_gray) // Disabled selected
+        inRange && enabled -> dayInSelectionRangeContentColor
+        inRange && !enabled -> disabledDayContentColor
+        isToday -> todayContentColor
+        enabled -> colorResource(R.color.dark_text_color) // Enabled default
+        else -> colorResource(R.color.light_gray) // Disabled default
+    }
 
     return if (inRange) {
         rememberUpdatedState(target)
     } else {
-        // Animate the content color only when the day is not in a range.
         animateColorAsState(target, tween(durationMillis = MotionTokens.DURATION_100.toInt()))
     }
 }
+
 
 /**
  * Represents the container color for a calendar day.
@@ -119,18 +120,19 @@ fun DatePickerColors.dayContainerColor(
     enabled: Boolean,
     animate: Boolean
 ): State<Color> {
-    val target =
-        if (selected) {
-            if (enabled) selectedDayContainerColor else disabledSelectedDayContainerColor
-        } else {
-            Color.Transparent
-        }
+    val target = when {
+        selected && enabled -> MaterialTheme.colorScheme.primary // Selected background = primary
+        selected && !enabled -> Color.Transparent                 // Disabled selected background
+        else -> Color.Transparent                                 // Default background
+    }
+
     return if (animate) {
         animateColorAsState(target, tween(durationMillis = MotionTokens.DURATION_100.toInt()))
     } else {
         rememberUpdatedState(target)
     }
 }
+
 
 /**
  * Represents the content color for a calendar year.

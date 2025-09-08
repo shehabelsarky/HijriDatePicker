@@ -25,6 +25,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.clearAndSetSemantics
@@ -182,9 +183,10 @@ object HijriDateRangePickerDefaults {
             }
             if (formatterStartDate != null) {
                 Text(
+                    color = colorResource(R.color.dark_blue),
                     text = formatterStartDate,
                     maxLines = 1,
-                    fontSize = fontSize.sp,
+                    fontSize = 14.sp,
                     onTextLayout = { result ->
                         if (result.hasVisualOverflow) {
                             fontSize--

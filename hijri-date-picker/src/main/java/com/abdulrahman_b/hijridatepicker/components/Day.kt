@@ -33,6 +33,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.text
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.sp
 import com.abdulrahman_b.hijridatepicker.R
 import com.abdulrahman_b.hijridatepicker.dayContainerColor
 import com.abdulrahman_b.hijridatepicker.dayContentColor
@@ -100,11 +101,15 @@ internal fun Day(
                 ),
             contentAlignment = Alignment.Center
         ) {
-            Text(text = dayNumber.toLocalString(), textAlign = TextAlign.Center)
+            Text(
+                text = dayNumber.toLocalString(),
+                textAlign = TextAlign.Center,
+                fontSize = 16.sp,
+                fontWeight = androidx.compose.ui.text.font.FontWeight.Normal
+            )
         }
     }
 }
-
 
 
 @Composable
