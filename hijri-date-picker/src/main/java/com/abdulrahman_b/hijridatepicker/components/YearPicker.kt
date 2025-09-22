@@ -88,36 +88,41 @@ internal fun YearPicker(
         val scrollToEarlierYearsLabel = stringResource(R.string.date_picker_scroll_to_earlier_years)
         val scrollToLaterYearsLabel = stringResource(R.string.date_picker_scroll_to_later_years)
 
-        // Keep grid attached at all times, use alpha to hide if needed
         LazyVerticalGrid(
             columns = GridCells.Fixed(YearsInRow),
             state = lazyGridState,
-            modifier = modifier
-                .background(containerColor)
-                .alpha(1f), // always in composition to prevent unattached node crash
+            modifier = modifier.background(containerColor),
             horizontalArrangement = Arrangement.SpaceEvenly,
             verticalArrangement = Arrangement.spacedBy(YearsVerticalPadding)
         ) {
             items(yearRange.count()) { index ->
                 val yearEntry = index + yearRange.first
                 val localizedYear = yearEntry.toLocalString()
+
+                // ✅ Compute semantics outside the Modifier.semantics block
+                val customActionsForItem = remember(
+                    lazyGridState.firstVisibleItemIndex,
+                    lazyGridState.layoutInfo.visibleItemsInfo.map { it.index }
+                ) {
+                    if (
+                        lazyGridState.firstVisibleItemIndex == index ||
+                        lazyGridState.layoutInfo.visibleItemsInfo.lastOrNull()?.index == index
+                    ) {
+                        customScrollActions(
+                            state = lazyGridState,
+                            coroutineScope = coroutineScope,
+                            scrollUpLabel = scrollToEarlierYearsLabel,
+                            scrollDownLabel = scrollToLaterYearsLabel
+                        )
+                    } else emptyList()
+                }
+
                 Year(
                     modifier = Modifier.requiredSize(
                         width = DatePickerModalTokens.SelectionYearContainerWidth,
                         height = DatePickerModalTokens.SelectionYearContainerHeight
                     ).semantics {
-                        customActions =
-                            if (
-                                lazyGridState.firstVisibleItemIndex == index ||
-                                lazyGridState.layoutInfo.visibleItemsInfo.lastOrNull()?.index == index
-                            ) {
-                                customScrollActions(
-                                    state = lazyGridState,
-                                    coroutineScope = coroutineScope,
-                                    scrollUpLabel = scrollToEarlierYearsLabel,
-                                    scrollDownLabel = scrollToLaterYearsLabel
-                                )
-                            } else emptyList()
+                        this.customActions = customActionsForItem
                     },
                     selected = yearEntry == displayedYear,
                     currentYear = yearEntry == currentYear,
@@ -133,12 +138,13 @@ internal fun YearPicker(
             }
         }
 
-        // Optional: reset scroll safely when needed
+        // Safe scroll to displayedYear
         LaunchedEffect(displayedYear) {
             lazyGridState.scrollToItem(max(0, displayedYear - yearRange.first - YearsInRow))
         }
     }
 }
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
