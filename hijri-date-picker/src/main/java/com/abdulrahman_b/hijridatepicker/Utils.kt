@@ -89,15 +89,16 @@ internal fun DatePickerColors.dayContentColor(
     inRange: Boolean,
     enabled: Boolean
 ): State<Color> {
-    val target = when {
-        selected && enabled -> Color.White  // Selected text = white
-        selected && !enabled -> colorResource(R.color.light_gray) // Disabled selected
-        inRange && enabled -> colorResource(R.color.secondary_light)
-        inRange && !enabled -> colorResource(R.color.light_gray)
-        isToday -> todayContentColor
-        enabled -> colorResource(R.color.dark_text_color) // Enabled default
-        else -> colorResource(R.color.light_gray) // Disabled default
-    }
+    val target =
+        when {
+            selected && enabled -> selectedDayContentColor
+            selected && !enabled -> disabledSelectedDayContentColor
+            inRange && enabled -> dayInSelectionRangeContentColor
+            inRange && !enabled -> disabledDayContentColor
+            isToday -> todayContentColor
+            enabled -> dayContentColor
+            else -> disabledDayContentColor
+        }
 
     return if (inRange) {
         rememberUpdatedState(target)
@@ -120,12 +121,12 @@ fun DatePickerColors.dayContainerColor(
     enabled: Boolean,
     animate: Boolean
 ): State<Color> {
-    val target = when {
-        selected && enabled -> MaterialTheme.colorScheme.secondary // Selected background = secondary
-        selected && !enabled -> Color.Transparent                 // Disabled selected background
-        else -> Color.Transparent                                 // Default background
-    }
-
+    val target =
+        if (selected) {
+            if (enabled) selectedDayContainerColor else disabledSelectedDayContainerColor
+        } else {
+            Color.Transparent
+        }
     return if (animate) {
         animateColorAsState(target, tween(durationMillis = MotionTokens.DURATION_100.toInt()))
     } else {
@@ -172,7 +173,7 @@ internal fun DatePickerColors.yearContentColor(
 internal fun DatePickerColors.yearContainerColor(selected: Boolean, enabled: Boolean): State<Color> {
     val target =
         if (selected) {
-            if (enabled) MaterialTheme.colorScheme.secondary else disabledSelectedYearContainerColor
+            if (enabled) selectedYearContainerColor else disabledSelectedYearContainerColor
         } else {
             Color.Transparent
         }

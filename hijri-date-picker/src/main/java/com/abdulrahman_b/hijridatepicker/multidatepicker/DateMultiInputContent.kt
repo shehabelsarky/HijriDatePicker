@@ -123,18 +123,6 @@ internal fun DateMultiInputContent(
                 colors = colors,
             )
         }
-
-       /* // ➕ Add extra input for appending a new date
-        TextButton(
-            onClick = {
-                val mutableList = selectedDates.toMutableList()
-                mutableList.add(null) // empty new slot
-                onDatesChange(mutableList)
-            },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(stringResource(R.string.add_another_date))
-        }*/
     }
 }
 

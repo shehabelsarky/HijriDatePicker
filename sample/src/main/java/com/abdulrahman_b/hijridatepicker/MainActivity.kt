@@ -85,7 +85,7 @@ fun DatePickerFormSample(
         )
 
         val datePickerState = rememberHijriDatePickerState(
-            yearRange = 1445..1449,
+            yearRange = 1300..1449,
             selectableDates = selectableDates,
         )
         var selectDateDialogOpen by remember { mutableStateOf(false) }

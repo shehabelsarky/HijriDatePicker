@@ -92,7 +92,7 @@ internal fun WeekDays(
                     text = it.second,
                     modifier = Modifier.wrapContentSize(),
                     color = colorResource(R.color.light_gray2),
-                    style = textStyle.copy(fontSize = 13.sp, fontWeight = FontWeight.Normal),
+                    style = textStyle.copy(fontSize = 11.sp, fontWeight = FontWeight.Normal),
                     overflow = TextOverflow.Ellipsis,
                     textAlign = TextAlign.Center
                 )
