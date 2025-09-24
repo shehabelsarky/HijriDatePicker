@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.material3.DatePickerColors
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -32,6 +33,7 @@ import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.text
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
 import com.abdulrahman_b.hijridatepicker.R
@@ -104,8 +106,9 @@ internal fun Day(
             Text(
                 text = dayNumber.toLocalString(),
                 textAlign = TextAlign.Center,
-                fontSize = 16.sp,
-                fontWeight = androidx.compose.ui.text.font.FontWeight.Normal
+                style = MaterialTheme.typography.bodySmall.copy(
+                    fontWeight = FontWeight.Normal // prevent bold
+                )
             )
         }
     }
