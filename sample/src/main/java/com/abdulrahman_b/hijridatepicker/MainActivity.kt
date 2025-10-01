@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -26,7 +27,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.abdulrahman_b.hijridatepicker.datepicker.DatePickerHeadlinePadding
 import com.abdulrahman_b.hijridatepicker.datepicker.HijriDatePicker
+import com.abdulrahman_b.hijridatepicker.datepicker.HijriDatePickerDefaults
 import com.abdulrahman_b.hijridatepicker.datepicker.rememberHijriDatePickerState
 import com.abdulrahman_b.hijridatepicker.multidatepicker.HijriMultiDatePicker
 import com.abdulrahman_b.hijridatepicker.multidatepicker.rememberHijriMultiDatePickerState
@@ -121,6 +124,19 @@ fun DatePickerFormSample(
                 },
             ) {
                 HijriDatePicker(state = datePickerState)
+
+                HijriDatePicker(
+                    state = datePickerState,
+                    modifier = Modifier,
+                    title = null, // 🔹 remove "Select date"
+                    headline = {
+                        HijriDatePickerDefaults.DatePickerHeadline(
+                            selectedDate = datePickerState.selectedDate,
+                            displayMode = datePickerState.displayMode,
+                            modifier = Modifier.padding(DatePickerHeadlinePadding),
+                        )
+                    }
+                )
             }
         }
 

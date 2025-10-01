@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.material3.DisplayMode
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -183,7 +184,7 @@ object HijriDateRangePickerDefaults {
             }
             if (formatterStartDate != null) {
                 Text(
-                    color = colorResource(R.color.dark_blue),
+                    color = MaterialTheme.colorScheme.primary,
                     text = formatterStartDate,
                     maxLines = 1,
                     fontSize = 14.sp,

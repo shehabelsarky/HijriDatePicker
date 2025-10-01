@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material3.DisplayMode
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -130,7 +131,7 @@ object HijriMultiDatePickerDefaults {
                 ) {
                     formattedDates.forEachIndexed { index, date ->
                         Text(
-                            color = colorResource(R.color.dark_blue),
+                            color = MaterialTheme.colorScheme.primary,
                             text = if (index == formattedDates.lastIndex) date else "$date, ",
                             fontSize = 14.sp,
                             overflow = TextOverflow.Clip

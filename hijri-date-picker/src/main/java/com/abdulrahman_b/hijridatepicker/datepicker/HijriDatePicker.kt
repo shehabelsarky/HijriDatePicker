@@ -123,7 +123,9 @@ fun HijriDatePicker(
                         DisplayModeToggleButton(
                             modifier = Modifier.padding(DatePickerModeTogglePadding),
                             displayMode = state.displayMode,
-                            onDisplayModeChange = { displayMode -> state.displayMode = displayMode },
+                            onDisplayModeChange = { displayMode ->
+                                state.displayMode = displayMode
+                            },
                         )
                     }
                 } else {
@@ -474,12 +476,14 @@ private fun MonthsNavigation(
                     IconButton(onClick = onPreviousClicked, enabled = previousAvailable) {
                         Icon(
                             Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+                            tint = LightSecondary,
                             contentDescription = stringResource(R.string.date_picker_switch_to_previous_month)
                         )
                     }
                     IconButton(onClick = onNextClicked, enabled = nextAvailable) {
                         Icon(
                             Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                            tint = LightSecondary,
                             contentDescription = stringResource(R.string.date_picker_switch_to_next_month)
                         )
                     }
@@ -496,7 +500,7 @@ internal val DatePickerHorizontalPadding = 12.dp
 internal val DatePickerModeTogglePadding = PaddingValues(end = 12.dp, bottom = 12.dp)
 
 private val DatePickerTitlePadding = PaddingValues(start = 24.dp, end = 12.dp, top = 16.dp)
-private val DatePickerHeadlinePadding = PaddingValues(start = 24.dp, end = 12.dp, bottom = 12.dp)
+val DatePickerHeadlinePadding = PaddingValues(start = 24.dp, end = 12.dp, bottom = 12.dp, top = 10.dp)
 
 internal const val DAYS_IN_WEEK = 7
 

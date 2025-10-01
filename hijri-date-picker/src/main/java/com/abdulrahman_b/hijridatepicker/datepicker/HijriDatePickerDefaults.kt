@@ -143,7 +143,7 @@ object HijriDatePickerDefaults {
             mutableFloatStateOf(style.fontSize.value)
         }
         Text(
-            color = colorResource(R.color.dark_blue),
+            color = MaterialTheme.colorScheme.primary,
             text = headlineText,
             modifier = modifier.semantics {
                 liveRegion = LiveRegionMode.Companion.Polite
