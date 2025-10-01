@@ -1,6 +1,12 @@
 package com.abdulrahman_b.hijridatepicker.multidatepicker
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -8,26 +14,34 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.requiredSize
+import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
-import androidx.compose.foundation.pager.VerticalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.DatePickerColors
+import androidx.compose.material3.DividerDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.customActions
+import androidx.compose.ui.semantics.paneTitle
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.abdulrahman_b.hijrahdatetime.extensions.HijrahDates.withDayOfMonth
+import com.abdulrahman_b.hijrahdatetime.extensions.HijrahDates.withYear
 import com.abdulrahman_b.hijrahdatetime.extensions.HijrahDates.year
 import com.abdulrahman_b.hijridatepicker.HijriSelectableDates
 import com.abdulrahman_b.hijridatepicker.LocalFirstDayOfWeek
@@ -35,6 +49,8 @@ import com.abdulrahman_b.hijridatepicker.LocalPickerDecimalStyle
 import com.abdulrahman_b.hijridatepicker.LocalPickerFormatter
 import com.abdulrahman_b.hijridatepicker.LocalPickerLocale
 import com.abdulrahman_b.hijridatepicker.R
+import com.abdulrahman_b.hijridatepicker.R.string.date_range_picker_scroll_to_next_month
+import com.abdulrahman_b.hijridatepicker.R.string.date_range_picker_scroll_to_previous_month
 import com.abdulrahman_b.hijridatepicker.calculateDateFromPage
 import com.abdulrahman_b.hijridatepicker.calculateDaysFromStartOfWeekToFirstOfMonth
 import com.abdulrahman_b.hijridatepicker.calculatePageFromDate
@@ -42,6 +58,7 @@ import com.abdulrahman_b.hijridatepicker.calculateTotalPages
 import com.abdulrahman_b.hijridatepicker.components.Day
 import com.abdulrahman_b.hijridatepicker.components.MAX_CALENDAR_ROWS
 import com.abdulrahman_b.hijridatepicker.components.WeekDays
+import com.abdulrahman_b.hijridatepicker.components.YearPicker
 import com.abdulrahman_b.hijridatepicker.components.updateDisplayedMonth
 import com.abdulrahman_b.hijridatepicker.datepicker.DAYS_IN_WEEK
 import com.abdulrahman_b.hijridatepicker.datepicker.DateInputFormat
@@ -49,15 +66,14 @@ import com.abdulrahman_b.hijridatepicker.datepicker.DateInputTextField
 import com.abdulrahman_b.hijridatepicker.datepicker.DatePickerHorizontalPadding
 import com.abdulrahman_b.hijridatepicker.datepicker.InputIdentifier
 import com.abdulrahman_b.hijridatepicker.datepicker.InputTextFieldPadding
+import com.abdulrahman_b.hijridatepicker.datepicker.MonthsNavigation
 import com.abdulrahman_b.hijridatepicker.datepicker.RecommendedSizeForAccessibility
-import com.abdulrahman_b.hijridatepicker.rangedatepicker.CalendarMonthSubheadPadding
 import com.abdulrahman_b.hijridatepicker.rangedatepicker.customScrollActions
 import com.abdulrahman_b.hijridatepicker.rememberDateInputValidator
 import com.abdulrahman_b.hijridatepicker.tokens.DatePickerModalTokens
+import kotlinx.coroutines.launch
 import java.time.chrono.HijrahDate
 import java.time.format.DecimalStyle
-import com.abdulrahman_b.hijridatepicker.R.string.date_range_picker_scroll_to_next_month
-import com.abdulrahman_b.hijridatepicker.R.string.date_range_picker_scroll_to_previous_month
 
 /**
  * Equivalent of DateInputContent/DateRangeInputContent for MULTI date selection
@@ -138,31 +154,91 @@ internal fun MultiDatePickerContent(
     selectableDates: HijriSelectableDates,
     colors: DatePickerColors
 ) {
+    val coroutineScope = rememberCoroutineScope()
+    var yearPickerVisible by rememberSaveable { mutableStateOf(false) }
+
     val monthPager = rememberPagerState(
         initialPage = calculatePageFromDate(displayedMonth, yearRange),
     ) {
         calculateTotalPages(yearRange)
     }
 
-    Column(modifier = Modifier.padding(horizontal = DatePickerHorizontalPadding)) {
-        WeekDays(colors)
-
-        VerticalMonthsListMulti(
-            monthPager = monthPager,
-            selectedDates = selectedDates,
-            onDatesSelectionChange = onDatesSelectionChange,
-            onDisplayedMonthChange = onDisplayedMonthChange,
-            yearRange = yearRange,
-            selectableDates = selectableDates,
+    Column {
+        MonthsNavigation(
+            modifier = Modifier.padding(horizontal = DatePickerHorizontalPadding),
+            nextAvailable = monthPager.canScrollForward,
+            previousAvailable = monthPager.canScrollBackward,
+            yearPickerVisible = yearPickerVisible,
+            yearPickerText = LocalPickerFormatter.current.formatMonthYear(
+                date = displayedMonth,
+                locale = LocalPickerLocale.current,
+                decimalStyle = LocalPickerDecimalStyle.current
+            ) ?: "-",
+            onNextClicked = {
+                coroutineScope.launch { monthPager.animateScrollToPage(monthPager.currentPage + 1) }
+            },
+            onPreviousClicked = {
+                coroutineScope.launch { monthPager.animateScrollToPage(monthPager.currentPage - 1) }
+            },
+            onYearPickerButtonClicked = { yearPickerVisible = !yearPickerVisible },
             colors = colors
         )
+
+        Box {
+            Column(modifier = Modifier.padding(horizontal = DatePickerHorizontalPadding)) {
+                WeekDays(colors)
+                HorizontalMonthsListMulti(
+                    monthPager = monthPager,
+                    selectedDates = selectedDates,
+                    onDatesSelectionChange = onDatesSelectionChange,
+                    onDisplayedMonthChange = onDisplayedMonthChange,
+                    yearRange = yearRange,
+                    selectableDates = selectableDates,
+                    colors = colors
+                )
+            }
+
+            this@Column.AnimatedVisibility(
+                visible = yearPickerVisible,
+                modifier = Modifier.clipToBounds(),
+                enter = expandVertically() + fadeIn(initialAlpha = 0.6f),
+                exit = shrinkVertically() + fadeOut()
+            ) {
+                val yearsPaneTitle = stringResource(R.string.date_picker_year_picker_pane_title)
+                Column(modifier = Modifier.semantics { paneTitle = yearsPaneTitle }) {
+                    YearPicker(
+                        modifier = Modifier
+                            .requiredHeight(
+                                RecommendedSizeForAccessibility * (MAX_CALENDAR_ROWS + 1) -
+                                        DividerDefaults.Thickness
+                            )
+                            .padding(horizontal = DatePickerHorizontalPadding),
+                        currentYear = HijrahDate.now().year,
+                        displayedYear = displayedMonth.year,
+                        onYearSelected = { year ->
+                            yearPickerVisible = false
+                            coroutineScope.launch {
+                                val withTargetYear = displayedMonth.withYear(year)
+                                val page = calculatePageFromDate(withTargetYear, yearRange)
+                                monthPager.scrollToPage(page)
+                            }
+                        },
+                        selectableDates = selectableDates,
+                        yearRange = yearRange,
+                        colors = colors
+                    )
+                    HorizontalDivider(color = colors.dividerColor)
+                }
+            }
+        }
     }
 }
 
 
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun VerticalMonthsListMulti(
+fun HorizontalMonthsListMulti(
     monthPager: PagerState,
     selectedDates: List<HijrahDate>,
     onDatesSelectionChange: (List<HijrahDate>) -> Unit,
@@ -189,27 +265,13 @@ fun VerticalMonthsListMulti(
                 scrollDownLabel = scrollToNextMonthLabel
             )
 
-        VerticalPager(
+        HorizontalPager(
             state = monthPager
         ) { currentPage ->
             val displayedMonth = calculateDateFromPage(currentPage, yearRange)
 
             Column(modifier = Modifier.fillMaxWidth()) {
-                ProvideTextStyle(DatePickerModalTokens.RangeSelectionMonthSubheadFont) {
-                    Text(
-                        text = dateFormatter.formatMonthYear(
-                            displayedMonth,
-                            LocalPickerLocale.current,
-                            LocalPickerDecimalStyle.current
-                        ) ?: "-",
-                        modifier = Modifier
-                            .padding(paddingValues = CalendarMonthSubheadPadding)
-                            .semantics { customActions = customAccessibilityAction },
-                        color = colors.subheadContentColor
-                    )
-                }
-
-                // MonthMulti instead of Month
+                // remove the month-year header if you don’t want it
                 MonthMulti(
                     displayedMonth = displayedMonth,
                     selectedDates = selectedDates,
@@ -230,6 +292,7 @@ fun VerticalMonthsListMulti(
         )
     }
 }
+
 
 
 

@@ -14,22 +14,33 @@ package com.abdulrahman_b.hijridatepicker.rangedatepicker/*
  * limitations under the License.
  */
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredHeight
+import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
-import androidx.compose.foundation.pager.VerticalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.DatePickerColors
 import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DatePickerFormatter
 import androidx.compose.material3.DisplayMode
+import androidx.compose.material3.DividerDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
@@ -40,15 +51,20 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.CustomAccessibilityAction
 import androidx.compose.ui.semantics.customActions
+import androidx.compose.ui.semantics.paneTitle
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import com.abdulrahman_b.hijrahdatetime.extensions.HijrahDates.withYear
+import com.abdulrahman_b.hijrahdatetime.extensions.HijrahDates.year
 import com.abdulrahman_b.hijridatepicker.*
 import com.abdulrahman_b.hijridatepicker.R.string.date_range_picker_scroll_to_next_month
 import com.abdulrahman_b.hijridatepicker.R.string.date_range_picker_scroll_to_previous_month
 import com.abdulrahman_b.hijridatepicker.components.DatePickerAnimatedContent
+import com.abdulrahman_b.hijridatepicker.components.MAX_CALENDAR_ROWS
 import com.abdulrahman_b.hijridatepicker.components.Month
 import com.abdulrahman_b.hijridatepicker.components.WeekDays
+import com.abdulrahman_b.hijridatepicker.components.YearPicker
 import com.abdulrahman_b.hijridatepicker.components.updateDisplayedMonth
 import com.abdulrahman_b.hijridatepicker.datepicker.*
 import com.abdulrahman_b.hijridatepicker.tokens.DatePickerModalTokens
@@ -59,6 +75,10 @@ import java.time.chrono.HijrahDate
 import java.time.format.DecimalStyle
 import java.time.format.TextStyle
 import java.util.*
+import com.abdulrahman_b.hijridatepicker.R
+import androidx.compose.ui.res.stringResource
+
+
 /**
  * HijriDateRangePicker is a composable function that provides a date range picker for selecting a range of dates
  * in the Hijri calendar system. It can be embedded into various UI components and supports customization.
@@ -119,21 +139,21 @@ fun HijriDateRangePicker(
             modifier = modifier,
             title = title,
             headline = headline,
-            modeToggleButton =
-                if (showModeToggle) {
-                    {
-                        DisplayModeToggleButton(
-                            modifier = Modifier.padding(DatePickerModeTogglePadding),
-                            displayMode = state.displayMode,
-                            onDisplayModeChange = { displayMode -> state.displayMode = displayMode },
-                        )
-                    }
-                } else {
-                    null
-                },
+            modeToggleButton = if (showModeToggle) {
+                {
+                    DisplayModeToggleButton(
+                        modifier = Modifier.padding(DatePickerModeTogglePadding),
+                        displayMode = state.displayMode,
+                        onDisplayModeChange = { displayMode ->
+                            state.displayMode = displayMode
+                        },
+                    )
+                }
+            } else {
+                null
+            },
             headlineTextStyle = DatePickerModalTokens.RangeSelectionHeaderHeadlineFont,
-            headerMinHeight =
-                DatePickerModalTokens.RangeSelectionHeaderContainerHeight - HeaderHeightOffset,
+            headerMinHeight = DatePickerModalTokens.RangeSelectionHeaderContainerHeight - HeaderHeightOffset,
             colors = colors,
         ) {
 
@@ -158,7 +178,6 @@ fun HijriDateRangePicker(
 }
 
 
-
 /**
  * Date entry content that displays a [DateRangePickerContent] or a [DateRangeInputContent]
  * according to the state's display mode.
@@ -180,17 +199,16 @@ private fun SwitchableDateEntryContent(
     val dateFormatter = LocalPickerFormatter.current
     DatePickerAnimatedContent(displayMode) { mode ->
         when (mode) {
-            DisplayMode.Picker ->
-                DateRangePickerContent(
-                    selectedStartDateMillis = selectedStartDate,
-                    selectedEndDateMillis = selectedEndDate,
-                    displayedMonth = displayedMonth,
-                    onDatesSelectionChange = onDatesSelectionChange,
-                    onDisplayedMonthChange = onDisplayedMonthChange,
-                    yearRange = yearRange,
-                    selectableDates = selectableDates,
-                    colors = colors
-                )
+            DisplayMode.Picker -> DateRangePickerContent(
+                selectedStartDateMillis = selectedStartDate,
+                selectedEndDateMillis = selectedEndDate,
+                displayedMonth = displayedMonth,
+                onDatesSelectionChange = onDatesSelectionChange,
+                onDisplayedMonthChange = onDisplayedMonthChange,
+                yearRange = yearRange,
+                selectableDates = selectableDates,
+                colors = colors
+            )
 
             DisplayMode.Input -> {
                 DateRangeInputContent(
@@ -220,6 +238,8 @@ private fun DateRangePickerContent(
     selectableDates: HijriSelectableDates,
     colors: DatePickerColors
 ) {
+    val coroutineScope = rememberCoroutineScope()
+    var yearPickerVisible by rememberSaveable { mutableStateOf(false) }
 
     val monthPager = rememberPagerState(
         initialPage = calculatePageFromDate(displayedMonth, yearRange),
@@ -227,20 +247,78 @@ private fun DateRangePickerContent(
         calculateTotalPages(yearRange)
     }
 
-    Column(modifier = Modifier.padding(horizontal = DatePickerHorizontalPadding)) {
-        WeekDays(colors)
-        VerticalMonthsList(
-            monthPager = monthPager,
-            selectedStartDate = selectedStartDateMillis,
-            selectedEndDate = selectedEndDateMillis,
-            onDatesSelectionChange = onDatesSelectionChange,
-            onDisplayedMonthChange = onDisplayedMonthChange,
-            yearRange = yearRange,
-            selectableDates = selectableDates,
+    Column {
+        // 🔹 Navigation bar with arrows + year picker toggle
+        MonthsNavigation(
+            modifier = Modifier.padding(horizontal = DatePickerHorizontalPadding),
+            nextAvailable = monthPager.canScrollForward,
+            previousAvailable = monthPager.canScrollBackward,
+            yearPickerVisible = yearPickerVisible,
+            yearPickerText = LocalPickerFormatter.current.formatMonthYear(
+                date = displayedMonth,
+                locale = LocalPickerLocale.current,
+                decimalStyle = LocalPickerDecimalStyle.current
+            ) ?: "-",
+            onNextClicked = {
+                coroutineScope.launch { monthPager.animateScrollToPage(monthPager.currentPage + 1) }
+            },
+            onPreviousClicked = {
+                coroutineScope.launch { monthPager.animateScrollToPage(monthPager.currentPage - 1) }
+            },
+            onYearPickerButtonClicked = { yearPickerVisible = !yearPickerVisible },
             colors = colors
         )
+
+        Box {
+            Column(modifier = Modifier.padding(horizontal = DatePickerHorizontalPadding)) {
+                WeekDays(colors)
+                HorizontalMonthsList(
+                    monthPager = monthPager,
+                    selectedStartDate = selectedStartDateMillis,
+                    selectedEndDate = selectedEndDateMillis,
+                    onDatesSelectionChange = onDatesSelectionChange,
+                    onDisplayedMonthChange = onDisplayedMonthChange,
+                    yearRange = yearRange,
+                    selectableDates = selectableDates,
+                    colors = colors
+                )
+            }
+
+            this@Column.AnimatedVisibility(
+                visible = yearPickerVisible,
+                modifier = Modifier.clipToBounds(),
+                enter = expandVertically() + fadeIn(initialAlpha = 0.6f),
+                exit = shrinkVertically() + fadeOut()
+            ) {
+                val yearsPaneTitle = stringResource(R.string.date_picker_year_picker_pane_title)
+                Column(modifier = Modifier.semantics { paneTitle = yearsPaneTitle }) {
+                    YearPicker(
+                        modifier = Modifier
+                            .requiredHeight(
+                                RecommendedSizeForAccessibility * (MAX_CALENDAR_ROWS + 1) - DividerDefaults.Thickness
+                            )
+                            .padding(horizontal = DatePickerHorizontalPadding),
+                        currentYear = HijrahDate.now().year,
+                        displayedYear = displayedMonth.year,
+                        onYearSelected = { year ->
+                            yearPickerVisible = false
+                            coroutineScope.launch {
+                                val withTargetYear = displayedMonth.withYear(year)
+                                val page = calculatePageFromDate(withTargetYear, yearRange)
+                                monthPager.scrollToPage(page)
+                            }
+                        },
+                        selectableDates = selectableDates,
+                        yearRange = yearRange,
+                        colors = colors
+                    )
+                    HorizontalDivider(color = colors.dividerColor)
+                }
+            }
+        }
     }
 }
+
 
 /**
  * Composes a continuous vertical scrollable list of calendar months. Each month will appear with a
@@ -248,7 +326,7 @@ private fun DateRangePickerContent(
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun VerticalMonthsList(
+fun HorizontalMonthsList(
     monthPager: PagerState,
     selectedStartDate: HijrahDate?,
     selectedEndDate: HijrahDate?,
@@ -264,13 +342,9 @@ fun VerticalMonthsList(
 
     ProvideTextStyle(DatePickerModalTokens.DateLabelTextFont) {
         val coroutineScope = rememberCoroutineScope()
-        val scrollToPreviousMonthLabel =
-            stringResource(date_range_picker_scroll_to_previous_month)
-        val scrollToNextMonthLabel =
-            stringResource(date_range_picker_scroll_to_next_month)
+        val scrollToPreviousMonthLabel = stringResource(date_range_picker_scroll_to_previous_month)
+        val scrollToNextMonthLabel = stringResource(date_range_picker_scroll_to_next_month)
 
-        // The updateDateSelection will invoke the onDatesSelectionChange with the proper
-        // selection according to the current state.
         val onDateSelectionChange = { date: HijrahDate ->
             updateDateSelection(
                 date = date,
@@ -280,34 +354,21 @@ fun VerticalMonthsList(
             )
         }
 
-        val customAccessibilityAction =
-            customScrollActions(
-                state = monthPager,
-                coroutineScope = coroutineScope,
-                scrollUpLabel = scrollToPreviousMonthLabel,
-                scrollDownLabel = scrollToNextMonthLabel
-            )
+        val customAccessibilityAction = customScrollActions(
+            state = monthPager,
+            coroutineScope = coroutineScope,
+            scrollUpLabel = scrollToPreviousMonthLabel,
+            scrollDownLabel = scrollToNextMonthLabel
+        )
 
-        VerticalPager(
+        // ✅ Horizontal Pager instead of Vertical
+        HorizontalPager(
             state = monthPager
         ) { currentPage ->
             val displayedMonth = calculateDateFromPage(currentPage, yearRange)
 
             Column(modifier = Modifier.fillMaxWidth()) {
-                ProvideTextStyle(DatePickerModalTokens.RangeSelectionMonthSubheadFont) {
-                    Text(
-                        text =
-                            dateFormatter.formatMonthYear(
-                                displayedMonth,
-                                LocalPickerLocale.current,
-                                LocalPickerDecimalStyle.current
-                            ) ?: "-",
-                        modifier =
-                            Modifier.padding(paddingValues = CalendarMonthSubheadPadding)
-                                .semantics { customActions = customAccessibilityAction },
-                        color = colors.subheadContentColor
-                    )
-                }
+
                 val rangeSelectionInfo: SelectedRangeInfo? =
                     if (selectedStartDate != null && selectedEndDate != null) {
                         remember(selectedStartDate, selectedEndDate) {
@@ -321,6 +382,7 @@ fun VerticalMonthsList(
                     } else {
                         null
                     }
+
                 Month(
                     displayedMonth = displayedMonth,
                     onDateSelectionChange = onDateSelectionChange,
@@ -350,10 +412,7 @@ private fun updateDateSelection(
     currentEndDate: HijrahDate?,
     onDatesSelectionChange: (startDate: HijrahDate?, endDate: HijrahDate?) -> Unit
 ) {
-    if (
-        (currentStartDate == null && currentEndDate == null) ||
-        (currentStartDate != null && currentEndDate != null)
-    ) {
+    if ((currentStartDate == null && currentEndDate == null) || (currentStartDate != null && currentEndDate != null)) {
         // Set the selection to "start" only.
         onDatesSelectionChange(date, null)
     } else if (currentStartDate != null && date >= currentStartDate) {
@@ -368,7 +427,6 @@ private fun updateDateSelection(
 internal val CalendarMonthSubheadPadding = PaddingValues(start = 8.dp, top = 8.dp, bottom = 8.dp)
 
 
-
 /**
  * Draws the range selection background.
  *
@@ -376,8 +434,7 @@ internal val CalendarMonthSubheadPadding = PaddingValues(start = 8.dp, top = 8.d
  * an `rangeSelectionEnabled` flag.
  */
 internal fun DrawScope.drawRangeBackground(
-    selectedRangeInfo: SelectedRangeInfo,
-    color: Color
+    selectedRangeInfo: SelectedRangeInfo, color: Color
 ) {
     // The LazyVerticalGrid is defined to space the items horizontally by
     // DaysHorizontalPadding (e.g. 4.dp). However, as the grid is not limited in
@@ -395,15 +452,11 @@ internal fun DrawScope.drawRangeBackground(
     // The endX and startX are offset to include only half the item's width when dealing with first
     // and last items in the selection in order to keep the selection edges rounded.
     var startX =
-        x1 * (itemContainerWidth + horizontalSpaceBetweenItems) +
-                (if (selectedRangeInfo.firstIsSelectionStart) itemContainerWidth / 2 else 0f) +
-                horizontalSpaceBetweenItems / 2
+        x1 * (itemContainerWidth + horizontalSpaceBetweenItems) + (if (selectedRangeInfo.firstIsSelectionStart) itemContainerWidth / 2 else 0f) + horizontalSpaceBetweenItems / 2
     val startY = y1 * itemContainerHeight + stateLayerVerticalPadding
     var endX =
-        x2 * (itemContainerWidth + horizontalSpaceBetweenItems) +
-                (if (selectedRangeInfo.lastIsSelectionEnd) itemContainerWidth / 2
-                else itemContainerWidth) +
-                horizontalSpaceBetweenItems / 2
+        x2 * (itemContainerWidth + horizontalSpaceBetweenItems) + (if (selectedRangeInfo.lastIsSelectionEnd) itemContainerWidth / 2
+        else itemContainerWidth) + horizontalSpaceBetweenItems / 2
     val endY = y2 * itemContainerHeight + stateLayerVerticalPadding
 
     val isRtl = layoutDirection == LayoutDirection.Rtl
@@ -418,16 +471,13 @@ internal fun DrawScope.drawRangeBackground(
         color = color,
         topLeft = Offset(startX, startY),
         cornerRadius = RectangleCornerRadius,
-        size =
-            Size(
-                width =
-                    when {
-                        y1 == y2 -> endX - startX
-                        isRtl -> -startX
-                        else -> this.size.width - startX
-                    },
-                height = itemStateLayerHeight
-            )
+        size = Size(
+            width = when {
+                y1 == y2 -> endX - startX
+                isRtl -> -startX
+                else -> this.size.width - startX
+            }, height = itemStateLayerHeight
+        )
     )
 
     if (y1 != y2) {
@@ -446,11 +496,9 @@ internal fun DrawScope.drawRangeBackground(
             color = color,
             topLeft = Offset(topLeftX, endY),
             cornerRadius = RectangleCornerRadius,
-            size =
-                Size(
-                    width = if (isRtl) endX - this.size.width else endX,
-                    height = itemStateLayerHeight
-                )
+            size = Size(
+                width = if (isRtl) endX - this.size.width else endX, height = itemStateLayerHeight
+            )
         )
     }
 }
@@ -484,7 +532,8 @@ fun customScrollActions(
 }
 
 private val DateRangePickerTitlePadding = PaddingValues(start = 24.dp, end = 12.dp, top = 16.dp)
-private val DateRangePickerHeadlinePadding = PaddingValues(start = 24.dp, end = 12.dp, bottom = 12.dp)
+private val DateRangePickerHeadlinePadding =
+    PaddingValues(start = 24.dp, end = 12.dp, bottom = 12.dp)
 
 // An offset that is applied to the token value for the RangeSelectionHeaderContainerHeight. The
 // implementation does not render a "Save" and "X" buttons by default, so we don't take those into

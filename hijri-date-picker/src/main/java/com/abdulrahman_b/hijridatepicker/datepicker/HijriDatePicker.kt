@@ -429,7 +429,7 @@ internal fun DatePickerHeader(
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun MonthsNavigation(
+fun MonthsNavigation(
     modifier: Modifier,
     nextAvailable: Boolean,
     previousAvailable: Boolean,
