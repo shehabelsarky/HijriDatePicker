@@ -10,7 +10,7 @@
     <string name="date_input_label">Date</string>
     <string name="date_input_no_input_description">None</string>
     <string name="date_input_title">Select date</string>
-    <string name="date_picker_headline">"Selected date"</string>
+    <string name="date_picker_headline"></string>
     <string name="date_picker_headline_description">Current selection: %1$s</string>
     <string name="date_picker_navigate_to_year_description">Navigate to year %1$s</string>
     <string name="date_picker_no_selection_description">None</string>
@@ -30,10 +30,10 @@
     <string name="date_range_input_invalid_range_input">Invalid date range input</string>
     <string name="date_range_input_title">Enter dates</string>
     <string name="date_range_picker_day_in_range">In range</string>
-    <string name="date_range_picker_end_headline">End date</string>
+    <string name="date_range_picker_end_headline"></string>
     <string name="date_range_picker_scroll_to_next_month">Scroll to show the next month</string>
     <string name="date_range_picker_scroll_to_previous_month">Scroll to show the previous month</string>
-    <string name="date_range_picker_start_headline">Start date</string>
+    <string name="date_range_picker_start_headline"></string>
     <string name="date_range_picker_title">Select dates</string>
 
     <string name="done">Done</string>

@@ -93,7 +93,7 @@ object HijriDateRangePickerDefaults {
             endDateText = endDateText,
             startDatePlaceholder = { Text(text = startDateText) },
             endDatePlaceholder = { Text(text = endDateText) },
-            datesDelimiter = { Text(text = "-") },
+            datesDelimiter = { Text(text = "") },
         )
     }
 
@@ -200,7 +200,7 @@ object HijriDateRangePickerDefaults {
             datesDelimiter()
             if (formatterEndDate != null) {
                 Text(
-                    text = formatterEndDate,
+                    text = "- ".plus(formatterEndDate),
                     maxLines = 1,
                     fontSize = 14.sp,
                     onTextLayout = { result ->

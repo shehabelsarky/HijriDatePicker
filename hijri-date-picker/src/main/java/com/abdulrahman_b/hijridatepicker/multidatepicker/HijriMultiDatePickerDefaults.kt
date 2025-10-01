@@ -113,10 +113,13 @@ object HijriMultiDatePickerDefaults {
             }
 
             else -> {
-                // Format all selected dates as yyyy-MM-dd
                 val formattedDates = selectedDates.map { date ->
                     java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd").format(date)
                 }
+
+                val maxVisible = 6
+                val visibleDates = formattedDates.take(maxVisible)
+                val extraCount = formattedDates.size - maxVisible
 
                 headlineDescription = formattedDates.joinToString(", ")
 
@@ -129,16 +132,25 @@ object HijriMultiDatePickerDefaults {
                         },
                     maxItemsInEachRow = Int.MAX_VALUE
                 ) {
-                    formattedDates.forEachIndexed { index, date ->
+                    visibleDates.forEachIndexed { index, date ->
                         Text(
                             color = MaterialTheme.colorScheme.primary,
-                            text = if (index == formattedDates.lastIndex) date else "$date, ",
+                            text = if (index == visibleDates.lastIndex && extraCount <= 0) date else "$date, ",
                             fontSize = 14.sp,
                             overflow = TextOverflow.Clip
+                        )
+                    }
+
+                    if (extraCount > 0) {
+                        Text(
+                            text = ", +$extraCount",
+                            color = MaterialTheme.colorScheme.primary,
+                            fontSize = 14.sp
                         )
                     }
                 }
             }
         }
     }
+
 }
