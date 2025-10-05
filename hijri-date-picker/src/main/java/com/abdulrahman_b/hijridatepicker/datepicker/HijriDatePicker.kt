@@ -98,7 +98,7 @@ fun HijriDatePicker(
             modifier = Modifier.padding(DatePickerHeadlinePadding)
         )
     },
-    showModeToggle: Boolean = true,
+    showModeToggle: Boolean = false,
     locale: Locale = LocalConfiguration.current.locales[0],
     decimalStyle: DecimalStyle = DecimalStyle.of(locale),
     colors: DatePickerColors = DatePickerDefaults.colors()
@@ -118,7 +118,7 @@ fun HijriDatePicker(
             title = title,
             headline = headline,
             modeToggleButton =
-                if (showModeToggle) {
+                /*if (showModeToggle) {
                     {
                         DisplayModeToggleButton(
                             modifier = Modifier.padding(DatePickerModeTogglePadding),
@@ -128,9 +128,8 @@ fun HijriDatePicker(
                             },
                         )
                     }
-                } else {
-                    null
-                },
+                } else */
+                    null,
             headlineTextStyle = DatePickerModalTokens.HeaderHeadlineFont,
             headerMinHeight = DatePickerModalTokens.HeaderContainerHeight,
             colors = colors,

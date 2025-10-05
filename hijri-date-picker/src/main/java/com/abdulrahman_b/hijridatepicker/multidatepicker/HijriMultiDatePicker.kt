@@ -58,7 +58,7 @@ fun HijriMultiDatePicker(
     dayOfWeekTextStyle: java.time.format.TextStyle = java.time.format.TextStyle.SHORT,
     locale: Locale = LocalConfiguration.current.locales[0],
     decimalStyle: DecimalStyle = DecimalStyle.of(locale),
-    showModeToggle: Boolean = true,
+    showModeToggle: Boolean = false,
     colors: DatePickerColors = DatePickerDefaults.colors()
 ) {
     val selectableDates = state.selectableDates
@@ -75,7 +75,7 @@ fun HijriMultiDatePicker(
             title = title,
             headline = headline,
             modeToggleButton =
-                if (showModeToggle) {
+               /* if (showModeToggle) {
                     {
                         DisplayModeToggleButton(
                             modifier = Modifier.padding(DatePickerModeTogglePadding),
@@ -83,7 +83,9 @@ fun HijriMultiDatePicker(
                             onDisplayModeChange = { displayMode -> state.displayMode = displayMode },
                         )
                     }
-                } else null,
+                } else */
+
+                null,
             headlineTextStyle = DatePickerModalTokens.HeaderHeadlineFont,
             headerMinHeight = DatePickerModalTokens.HeaderContainerHeight,
             colors = colors,

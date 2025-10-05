@@ -122,7 +122,7 @@ fun HijriDateRangePicker(
     dayOfWeekTextStyle: TextStyle = TextStyle.SHORT,
     locale: Locale = LocalConfiguration.current.locales[0],
     decimalStyle: DecimalStyle = DecimalStyle.of(locale),
-    showModeToggle: Boolean = true,
+    showModeToggle: Boolean = false,
     colors: DatePickerColors = DatePickerDefaults.colors()
 ) {
     val selectableDates = state.selectableDates
@@ -139,7 +139,7 @@ fun HijriDateRangePicker(
             modifier = modifier,
             title = title,
             headline = headline,
-            modeToggleButton = if (showModeToggle) {
+            modeToggleButton = /*if (showModeToggle) {
                 {
                     DisplayModeToggleButton(
                         modifier = Modifier.padding(DatePickerModeTogglePadding),
@@ -149,9 +149,8 @@ fun HijriDateRangePicker(
                         },
                     )
                 }
-            } else {
-                null
-            },
+            } else */
+                null,
             headlineTextStyle = DatePickerModalTokens.RangeSelectionHeaderHeadlineFont,
             headerMinHeight = DatePickerModalTokens.RangeSelectionHeaderContainerHeight - HeaderHeightOffset,
             colors = colors,

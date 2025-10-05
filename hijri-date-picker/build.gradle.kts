@@ -77,7 +77,7 @@ afterEvaluate {
                 from(components["release"])
                 groupId = "com.github.shehabelsarky"
                 artifactId = "HijriDatePicker"
-                version = "1.0.10"
+                version = "1.0.11"
             }
         }
     }
